@@ -127,12 +127,13 @@ run_simulation_experiment <- function(nsim, sigma2, likelihood, path,
             
             #-----------------gpboost----------------- 
             t1 <- Sys.time()
-            gp_model <- fitGPModel(group_data = group_data, y = y, X = X, likelihood = likelihood)
+            gp_model <- fitGPModel(group_data = group_data, y = y, X = X,
+                                   likelihood = likelihood, params=list(std_dev = TRUE))
             # Note: gpboost uses Nesterov accelerated gradient descent by default.
-            #  This can be changed to "Nelder-Mead" using e.g. 'params=list(optimizer_cov="nelder_mead",maxit=10000)'
+            #  This can be changed to e.g. "Nelder-Mead" using 'params=list(optimizer_cov="nelder_mead",maxit=10000)'
             t2 <- Sys.time()
             ctime <- signif(difftime(t2, t1, units = "secs"), 3)
-            # summary(gp_model)
+            # summary(gp_model) # Show estimated model
             mse_coef <- mean((coef_true - gp_model$get_coef())^2)
             mse_vcs <- mean((vcs_true - gp_model$get_cov_pars())^2)
             results <- rbind(results,c("gpboost",randef_type,n,m,num_covariates,iter,
