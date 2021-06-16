@@ -134,7 +134,7 @@ run_simulation_experiment <- function(nsim, sigma2, likelihood, path,
             t2 <- Sys.time()
             ctime <- signif(difftime(t2, t1, units = "secs"), 3)
             # summary(gp_model) # Show estimated model
-            mse_coef <- mean((coef_true - gp_model$get_coef())^2)
+            mse_coef <- mean((coef_true - gp_model$get_coef()[1,])^2)
             mse_vcs <- mean((vcs_true - gp_model$get_cov_pars())^2)
             results <- rbind(results,c("gpboost",randef_type,n,m,num_covariates,iter,
                                        ctime,mse_coef,mse_vcs))
@@ -177,6 +177,9 @@ run_simulation_experiment <- function(nsim, sigma2, likelihood, path,
 
 nsim <- 100
 sigma2 <- 1
+
+nsim <- 5
+ndata_try <- c(100,200,500,1000)
 
 ###############################
 ## Varying number of samples
@@ -276,7 +279,8 @@ height <- 8
 height_all <- 4
 
 ## Varying number of samples
-p1 <- ggplot(data=results_sample_size, aes(x=n,y=time,color=package,shape=package)) + geom_jitter(alpha=0.1,width=0.01,height=0) +
+p1 <- ggplot(data=results_sample_size, aes(x=n,y=time,color=package,shape=package)) + 
+  geom_jitter(alpha=0.2,width=0.01,height=0) +
   stat_summary(fun=mean, geom="point",size=3,stroke=2.5,show.legend=FALSE) +
   stat_summary(fun=mean, geom="line",size=1,show.legend=FALSE) + 
   ylab("Time (sec)") + xlab("") +
@@ -285,7 +289,8 @@ p1 <- ggplot(data=results_sample_size, aes(x=n,y=time,color=package,shape=packag
                                             axis.title=element_text(size=16)) +
   theme(legend.position = "none")
 
-p2 <- ggplot(data=results_sample_size, aes(x=n,y=mse_coefs,color=package,shape=package)) + geom_jitter(alpha=0.1,width=0.01,height=0) +
+p2 <- ggplot(data=results_sample_size, aes(x=n,y=mse_coefs,color=package,shape=package)) + 
+  geom_jitter(alpha=0.2,width=0.01,height=0) +
   stat_summary(fun=mean, geom="point",size=3,stroke=2.5,show.legend=FALSE) +
   stat_summary(fun=mean, geom="line",size=1,show.legend=FALSE) +
   ylab("MSE coefficients") + xlab("Number samples") +
@@ -294,7 +299,8 @@ p2 <- ggplot(data=results_sample_size, aes(x=n,y=mse_coefs,color=package,shape=p
                                             axis.title=element_text(size=16)) +
   theme(legend.position = "none")
 
-p3 <- ggplot(data=results_sample_size, aes(x=n,y=mse_coefs,color=package,shape=package)) + geom_jitter(alpha=0.1,width=0.01,height=0) +
+p3 <- ggplot(data=results_sample_size, aes(x=n,y=mse_coefs,color=package,shape=package)) + 
+  geom_jitter(alpha=0.2,width=0.01,height=0) +
   stat_summary(fun=mean, geom="point",size=3,stroke=2.5,show.legend=FALSE) +
   stat_summary(fun=mean, geom="line",size=1,show.legend=FALSE) +
   ylab("MSE variance components") + xlab("") +
@@ -311,7 +317,8 @@ ggsave(pall,file=paste0(path,"plots/","Results_sample_size.jpeg"),height=height_
 
 
 ## Varying number of covariates
-p1 <- ggplot(data=results_num_covariates, aes(x=num_covariates,y=time,color=package,shape=package)) + geom_jitter(alpha=0.1,width=0.01,height=0) +
+p1 <- ggplot(data=results_num_covariates, aes(x=num_covariates,y=time,color=package,shape=package)) + 
+  geom_jitter(alpha=0.2,width=0.01,height=0) +
   stat_summary(fun=mean, geom="point",size=3,stroke=2.5,show.legend=FALSE) +
   stat_summary(fun=mean, geom="line",size=1,show.legend=FALSE) +
   ylab("Time (sec)") + xlab("") +
@@ -320,7 +327,8 @@ p1 <- ggplot(data=results_num_covariates, aes(x=num_covariates,y=time,color=pack
                                             axis.title=element_text(size=16)) +
   theme(legend.position = "none")
 
-p2 <- ggplot(data=results_num_covariates, aes(x=num_covariates,y=mse_coefs,color=package,shape=package)) + geom_jitter(alpha=0.1,width=0.01,height=0) +
+p2 <- ggplot(data=results_num_covariates, aes(x=num_covariates,y=mse_coefs,color=package,shape=package)) + 
+  geom_jitter(alpha=0.2,width=0.01,height=0) +
   stat_summary(fun=mean, geom="point",size=3,stroke=2.5,show.legend=FALSE) +
   stat_summary(fun=mean, geom="line",size=1,show.legend=FALSE) +
   ylab("MSE coefficients") + xlab("Number of covariates") +
@@ -329,7 +337,8 @@ p2 <- ggplot(data=results_num_covariates, aes(x=num_covariates,y=mse_coefs,color
                                             axis.title=element_text(size=16)) +
   theme(legend.position = "none")
 
-p3 <- ggplot(data=results_num_covariates, aes(x=num_covariates,y=mse_vcs,color=package,shape=package)) + geom_jitter(alpha=0.1,width=0.01,height=0) +
+p3 <- ggplot(data=results_num_covariates, aes(x=num_covariates,y=mse_vcs,color=package,shape=package)) + 
+  geom_jitter(alpha=0.2,width=0.01,height=0) +
   stat_summary(fun=mean, geom="point",size=3,stroke=2.5,show.legend=FALSE) +
   stat_summary(fun=mean, geom="line",size=1,show.legend=FALSE) +
   ylab("MSE variance components") + xlab("") +
@@ -346,7 +355,8 @@ ggsave(pall,file=paste0(path,"plots/","Results_num_covariates.jpeg"),height=heig
 
 
 ## Varying number of groups
-p1 <- ggplot(data=results_number_groups, aes(x=m,y=time,color=package,shape=package)) + geom_jitter(alpha=0.1,width=0.01,height=0) +
+p1 <- ggplot(data=results_number_groups, aes(x=m,y=time,color=package,shape=package)) + 
+  geom_jitter(alpha=0.2,width=0.01,height=0) +
   stat_summary(fun=mean, geom="point",size=3,stroke=2.5,show.legend=FALSE) +
   stat_summary(fun=mean, geom="line",size=1,show.legend=FALSE) +
   ylab("Time (sec)") + xlab("") +
@@ -355,7 +365,8 @@ p1 <- ggplot(data=results_number_groups, aes(x=m,y=time,color=package,shape=pack
                                             axis.title=element_text(size=16)) +
   theme(legend.position = "none")
 
-p2 <- ggplot(data=results_number_groups, aes(x=m,y=mse_coefs,color=package,shape=package)) + geom_jitter(alpha=0.1,width=0.01,height=0) +
+p2 <- ggplot(data=results_number_groups, aes(x=m,y=mse_coefs,color=package,shape=package)) + 
+  geom_jitter(alpha=0.2,width=0.01,height=0) +
   stat_summary(fun=mean, geom="point",size=3,stroke=2.5,show.legend=FALSE) +
   stat_summary(fun=mean, geom="line",size=1,show.legend=FALSE) +
   ylab("MSE coefficients") + xlab("Number of groups") +
@@ -364,7 +375,8 @@ p2 <- ggplot(data=results_number_groups, aes(x=m,y=mse_coefs,color=package,shape
                                             axis.title=element_text(size=16)) +
   theme(legend.position = "none")
 
-p3 <- ggplot(data=results_number_groups, aes(x=m,y=mse_vcs,color=package,shape=package)) + geom_jitter(alpha=0.1,width=0.01,height=0) +
+p3 <- ggplot(data=results_number_groups, aes(x=m,y=mse_vcs,color=package,shape=package)) + 
+  geom_jitter(alpha=0.2,width=0.01,height=0) +
   stat_summary(fun=mean, geom="point",size=3,stroke=2.5,show.legend=FALSE) +
   stat_summary(fun=mean, geom="line",size=1,show.legend=FALSE) +
   ylab("MSE variance components") + xlab("") + 
@@ -388,7 +400,8 @@ for (i in 1:length(randef_type_try)){
   results_randef_type$randef_type[results_randef_type$randef_type==randef_type_try[i]] = new_names[i]
 }
 
-p1 <- ggplot(data=results_randef_type, aes(x=randef_type,y=time,color=package,shape=package)) + geom_jitter(alpha=0.1,width=0.01,height=0) +
+p1 <- ggplot(data=results_randef_type, aes(x=randef_type,y=time,color=package,shape=package)) + 
+  geom_jitter(alpha=0.2,width=0.01,height=0) +
   stat_summary(fun=mean, geom="point",size=3,stroke=2.5,show.legend=FALSE) +
   ylab("Time (sec)") + xlab("") +
   scale_y_log10() + theme(plot.title=element_text(hjust=0.5),
@@ -397,7 +410,8 @@ p1 <- ggplot(data=results_randef_type, aes(x=randef_type,y=time,color=package,sh
                           axis.text.x=element_text(angle=45,hjust=1,vjust=1)) +
   theme(legend.position = "none")
 
-p2 <- ggplot(data=results_randef_type, aes(x=randef_type,y=mse_coefs,color=package,shape=package)) + geom_jitter(alpha=0.1,width=0.01,height=0) +
+p2 <- ggplot(data=results_randef_type, aes(x=randef_type,y=mse_coefs,color=package,shape=package)) + 
+  geom_jitter(alpha=0.2,width=0.01,height=0) +
   stat_summary(fun=mean, geom="point",size=3,stroke=2.5,show.legend=FALSE) +
   ylab("MSE coefficients") + xlab("Random effect type") + 
   scale_y_log10() + theme(plot.title=element_text(hjust=0.5),
@@ -406,7 +420,8 @@ p2 <- ggplot(data=results_randef_type, aes(x=randef_type,y=mse_coefs,color=packa
                           axis.text.x=element_text(angle=45,hjust=1,vjust=1)) +
   theme(legend.position = "none")
 
-p3 <- ggplot(data=results_randef_type, aes(x=randef_type,y=mse_vcs,color=package,shape=package)) + geom_jitter(alpha=0.1,width=0.01,height=0) +
+p3 <- ggplot(data=results_randef_type, aes(x=randef_type,y=mse_vcs,color=package,shape=package)) + 
+  geom_jitter(alpha=0.2,width=0.01,height=0) +
   stat_summary(fun=mean, geom="point",size=3,stroke=2.5,show.legend=FALSE) +
   ylab("MSE variance components") + xlab("") +
   scale_y_log10() + theme(plot.title=element_text(hjust=0.5),
@@ -423,7 +438,8 @@ ggsave(pall,file=paste0(path,"plots/","Results_randef_type.jpeg"),height=height_
 
 
 ## Poisson likelihood
-p1 <- ggplot(data=results_poisson_sample_size, aes(x=n,y=time,color=package,shape=package)) + geom_jitter(alpha=0.1,width=0.01,height=0) +
+p1 <- ggplot(data=results_poisson_sample_size, aes(x=n,y=time,color=package,shape=package)) + 
+  geom_jitter(alpha=0.2,width=0.01,height=0) +
   stat_summary(fun=mean, geom="point",size=3,stroke=2.5,show.legend=FALSE) +
   stat_summary(fun=mean, geom="line",size=1,show.legend=FALSE) +
   ylab("Time (sec)") + xlab("") + 
@@ -432,7 +448,8 @@ p1 <- ggplot(data=results_poisson_sample_size, aes(x=n,y=time,color=package,shap
                                             axis.title=element_text(size=16)) +
   theme(legend.position = "none")
 
-p2 <- ggplot(data=results_poisson_sample_size, aes(x=n,y=mse_coefs,color=package,shape=package)) + geom_jitter(alpha=0.1,width=0.01,height=0) +
+p2 <- ggplot(data=results_poisson_sample_size, aes(x=n,y=mse_coefs,color=package,shape=package)) + 
+  geom_jitter(alpha=0.2,width=0.01,height=0) +
   stat_summary(fun=mean, geom="point",size=3,stroke=2.5,show.legend=FALSE) +
   stat_summary(fun=mean, geom="line",size=1,show.legend=FALSE) +
   ylab("MSE coefficients") + xlab("Number samples") +
@@ -441,7 +458,8 @@ p2 <- ggplot(data=results_poisson_sample_size, aes(x=n,y=mse_coefs,color=package
                                             axis.title=element_text(size=16)) +
   theme(legend.position = "none")
 
-p3 <- ggplot(data=results_poisson_sample_size, aes(x=n,y=mse_coefs,color=package,shape=package)) + geom_jitter(alpha=0.1,width=0.01,height=0) +
+p3 <- ggplot(data=results_poisson_sample_size, aes(x=n,y=mse_coefs,color=package,shape=package)) + 
+  geom_jitter(alpha=0.2,width=0.01,height=0) +
   stat_summary(fun=mean, geom="point",size=3,stroke=2.5,show.legend=FALSE) +
   stat_summary(fun=mean, geom="line",size=1,show.legend=FALSE) +
   ylab("MSE variance components") + xlab("") +
