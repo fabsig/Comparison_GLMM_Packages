@@ -7,6 +7,7 @@ library(lme4)
 library(reticulate)
 # py_install("statsmodels", pip=TRUE)
 path <- "C:/GLMM_comparison/"
+# Note: Set working directory to source file location for using reticulate
 
 sim_GLMM_data <- function(n, m, randef_type, likelihood, 
                           num_covariates = 10, sigma2 = 1){
@@ -178,9 +179,6 @@ run_simulation_experiment <- function(nsim, sigma2, likelihood, path,
 nsim <- 100
 sigma2 <- 1
 
-nsim <- 5
-ndata_try <- c(100,200,500,1000)
-
 ###############################
 ## Varying number of samples
 ###############################
@@ -286,7 +284,7 @@ p1 <- ggplot(data=results_sample_size, aes(x=n,y=time,color=package,shape=packag
   ylab("Time (sec)") + xlab("") +
   scale_y_log10() + scale_x_log10() + theme(plot.title=element_text(hjust=0.5),
                                             axis.text=element_text(size=12),
-                                            axis.title=element_text(size=16)) +
+                                            axis.title=element_text(size=20)) +
   theme(legend.position = "none")
 
 p2 <- ggplot(data=results_sample_size, aes(x=n,y=mse_coefs,color=package,shape=package)) + 
@@ -296,7 +294,7 @@ p2 <- ggplot(data=results_sample_size, aes(x=n,y=mse_coefs,color=package,shape=p
   ylab("MSE coefficients") + xlab("Number samples") +
   scale_y_log10() + scale_x_log10() + theme(plot.title=element_text(hjust=0.5),
                                             axis.text=element_text(size=12),
-                                            axis.title=element_text(size=16)) +
+                                            axis.title=element_text(size=20)) +
   theme(legend.position = "none")
 
 p3 <- ggplot(data=results_sample_size, aes(x=n,y=mse_coefs,color=package,shape=package)) + 
@@ -306,9 +304,9 @@ p3 <- ggplot(data=results_sample_size, aes(x=n,y=mse_coefs,color=package,shape=p
   ylab("MSE variance components") + xlab("") +
   scale_y_log10() + scale_x_log10() + theme(plot.title=element_text(hjust=0.5),
                                             axis.text=element_text(size=12),
-                                            axis.title=element_text(size=16),
-                                            legend.text=element_text(size=14),
-                                            legend.title=element_text(size=16)) +
+                                            axis.title=element_text(size=20),
+                                            legend.text=element_text(size=20),
+                                            legend.title=element_text(size=20)) +
   guides(colour=guide_legend(override.aes=list(alpha=1,size=3,stroke=2.5),title="Package"),
          shape=guide_legend(title="Package"))
 
@@ -324,7 +322,7 @@ p1 <- ggplot(data=results_num_covariates, aes(x=num_covariates,y=time,color=pack
   ylab("Time (sec)") + xlab("") +
   scale_y_log10() + scale_x_log10() + theme(plot.title=element_text(hjust=0.5),
                                             axis.text=element_text(size=12),
-                                            axis.title=element_text(size=16)) +
+                                            axis.title=element_text(size=20)) +
   theme(legend.position = "none")
 
 p2 <- ggplot(data=results_num_covariates, aes(x=num_covariates,y=mse_coefs,color=package,shape=package)) + 
@@ -334,7 +332,7 @@ p2 <- ggplot(data=results_num_covariates, aes(x=num_covariates,y=mse_coefs,color
   ylab("MSE coefficients") + xlab("Number of covariates") +
   scale_y_log10() + scale_x_log10() + theme(plot.title=element_text(hjust=0.5),
                                             axis.text=element_text(size=12),
-                                            axis.title=element_text(size=16)) +
+                                            axis.title=element_text(size=20)) +
   theme(legend.position = "none")
 
 p3 <- ggplot(data=results_num_covariates, aes(x=num_covariates,y=mse_vcs,color=package,shape=package)) + 
@@ -344,9 +342,9 @@ p3 <- ggplot(data=results_num_covariates, aes(x=num_covariates,y=mse_vcs,color=p
   ylab("MSE variance components") + xlab("") +
   scale_y_log10() + scale_x_log10() + theme(plot.title=element_text(hjust=0.5),
                                             axis.text=element_text(size=12),
-                                            axis.title=element_text(size=16),
-                                            legend.text=element_text(size=14),
-                                            legend.title=element_text(size=16)) +
+                                            axis.title=element_text(size=20),
+                                            legend.text=element_text(size=20),
+                                            legend.title=element_text(size=20)) +
   guides(colour=guide_legend(override.aes=list(alpha=1,size=3,stroke=2.5),title="Package"),
          shape=guide_legend(title="Package"))
 
@@ -362,7 +360,7 @@ p1 <- ggplot(data=results_number_groups, aes(x=m,y=time,color=package,shape=pack
   ylab("Time (sec)") + xlab("") +
   scale_y_log10() + scale_x_log10() + theme(plot.title=element_text(hjust=0.5),
                                             axis.text=element_text(size=12),
-                                            axis.title=element_text(size=16)) +
+                                            axis.title=element_text(size=20)) +
   theme(legend.position = "none")
 
 p2 <- ggplot(data=results_number_groups, aes(x=m,y=mse_coefs,color=package,shape=package)) + 
@@ -372,7 +370,7 @@ p2 <- ggplot(data=results_number_groups, aes(x=m,y=mse_coefs,color=package,shape
   ylab("MSE coefficients") + xlab("Number of groups") +
   scale_y_log10() + scale_x_log10() + theme(plot.title=element_text(hjust=0.5),
                                             axis.text=element_text(size=12),
-                                            axis.title=element_text(size=16)) +
+                                            axis.title=element_text(size=20)) +
   theme(legend.position = "none")
 
 p3 <- ggplot(data=results_number_groups, aes(x=m,y=mse_vcs,color=package,shape=package)) + 
@@ -382,9 +380,9 @@ p3 <- ggplot(data=results_number_groups, aes(x=m,y=mse_vcs,color=package,shape=p
   ylab("MSE variance components") + xlab("") + 
   scale_y_log10() + scale_x_log10() + theme(plot.title=element_text(hjust=0.5),
                                             axis.text=element_text(size=12),
-                                            axis.title=element_text(size=16),
-                                            legend.text=element_text(size=14),
-                                            legend.title=element_text(size=16)) +
+                                            axis.title=element_text(size=20),
+                                            legend.text=element_text(size=20),
+                                            legend.title=element_text(size=20)) +
   guides(colour=guide_legend(override.aes=list(alpha=1,size=3,stroke=2.5),title="Package"),
          shape=guide_legend(title="Package"))
 
@@ -406,7 +404,7 @@ p1 <- ggplot(data=results_randef_type, aes(x=randef_type,y=time,color=package,sh
   ylab("Time (sec)") + xlab("") +
   scale_y_log10() + theme(plot.title=element_text(hjust=0.5),
                           axis.text=element_text(size=12),
-                          axis.title=element_text(size=16),
+                          axis.title=element_text(size=20),
                           axis.text.x=element_text(angle=45,hjust=1,vjust=1)) +
   theme(legend.position = "none")
 
@@ -416,7 +414,7 @@ p2 <- ggplot(data=results_randef_type, aes(x=randef_type,y=mse_coefs,color=packa
   ylab("MSE coefficients") + xlab("Random effect type") + 
   scale_y_log10() + theme(plot.title=element_text(hjust=0.5),
                           axis.text=element_text(size=12),
-                          axis.title=element_text(size=16),
+                          axis.title=element_text(size=20),
                           axis.text.x=element_text(angle=45,hjust=1,vjust=1)) +
   theme(legend.position = "none")
 
@@ -425,10 +423,10 @@ p3 <- ggplot(data=results_randef_type, aes(x=randef_type,y=mse_vcs,color=package
   stat_summary(fun=mean, geom="point",size=3,stroke=2.5,show.legend=FALSE) +
   ylab("MSE variance components") + xlab("") +
   scale_y_log10() + theme(plot.title=element_text(hjust=0.5),
-                          legend.text=element_text(size=14),
-                          legend.title=element_text(size=16),
+                          legend.text=element_text(size=20),
+                          legend.title=element_text(size=20),
                           axis.text=element_text(size=12),
-                          axis.title=element_text(size=16),
+                          axis.title=element_text(size=20),
                           axis.text.x=element_text(angle=45, hjust=1,vjust=1)) +
   guides(colour=guide_legend(override.aes=list(alpha=1,size=3,stroke=2.5),title="Package"),
          shape=guide_legend(title="Package"))
@@ -445,7 +443,7 @@ p1 <- ggplot(data=results_poisson_sample_size, aes(x=n,y=time,color=package,shap
   ylab("Time (sec)") + xlab("") + 
   scale_y_log10() + scale_x_log10() + theme(plot.title=element_text(hjust=0.5),
                                             axis.text=element_text(size=12),
-                                            axis.title=element_text(size=16)) +
+                                            axis.title=element_text(size=20)) +
   theme(legend.position = "none")
 
 p2 <- ggplot(data=results_poisson_sample_size, aes(x=n,y=mse_coefs,color=package,shape=package)) + 
@@ -455,7 +453,7 @@ p2 <- ggplot(data=results_poisson_sample_size, aes(x=n,y=mse_coefs,color=package
   ylab("MSE coefficients") + xlab("Number samples") +
   scale_y_log10() + scale_x_log10() + theme(plot.title=element_text(hjust=0.5),
                                             axis.text=element_text(size=12),
-                                            axis.title=element_text(size=16)) +
+                                            axis.title=element_text(size=20)) +
   theme(legend.position = "none")
 
 p3 <- ggplot(data=results_poisson_sample_size, aes(x=n,y=mse_coefs,color=package,shape=package)) + 
@@ -465,9 +463,9 @@ p3 <- ggplot(data=results_poisson_sample_size, aes(x=n,y=mse_coefs,color=package
   ylab("MSE variance components") + xlab("") +
   scale_y_log10() + scale_x_log10() + theme(plot.title=element_text(hjust=0.5),
                                             axis.text=element_text(size=12),
-                                            axis.title=element_text(size=16),
-                                            legend.text=element_text(size=14),
-                                            legend.title=element_text(size=16)) +
+                                            axis.title=element_text(size=20),
+                                            legend.text=element_text(size=20),
+                                            legend.title=element_text(size=20)) +
   guides(colour=guide_legend(override.aes=list(alpha=1,size=3,stroke=2.5),title="Package"),
          shape=guide_legend(title="Package"))
 
