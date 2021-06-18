@@ -473,3 +473,7 @@ pall <- grid.arrange(p1, p2, p3, ncol=3, widths=c(1,1,1.45))
 ggsave(pall,file=paste0(path,"plots/","Results_poisson_sample_size.jpeg"),height=height_all,width=4*height_all)
 
 
+library(dplyr)
+print(results_num_covariates %>% group_by(package,num_covariates) %>% summarise(time=mean(time)))
+print(results_number_groups %>% group_by(package,m) %>% summarise(time=mean(time)), n=24)
+
