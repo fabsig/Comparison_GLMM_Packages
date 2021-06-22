@@ -23,6 +23,7 @@ if(len(group_data_P.shape)==1):
 else:
     num_randeff = group_data_P.shape[1]
 num_coef = X_P.shape[1]
+
 # Fit model
 if likelihood_P == 'bernoulli_probit':
     model = glm.BinomialBayesMixedGLM(endog=y_P, exog=X_P, exog_vc=group_data_P,
