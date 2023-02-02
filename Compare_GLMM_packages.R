@@ -7,6 +7,7 @@ library(lme4)
 library(reticulate)
 # py_install("statsmodels", pip=TRUE)
 path <- "C:/GLMM_comparison/"
+gpb_version <- paste0("version=", packageVersion("gpboost"))
 # Note: Set working directory to source file location for using reticulate
 
 sim_GLMM_data <- function(n, m, randef_type, likelihood, 
@@ -67,7 +68,7 @@ sim_GLMM_data <- function(n, m, randef_type, likelihood,
     mu <- exp(lp + eps)
     y <- qpois(runif(n), lambda = mu)
   } else if (likelihood == "gamma") {
-    mu <- exp(f + eps)
+    mu <- exp(lp + eps)
     y <- qgamma(runif(n), scale = mu, shape = 1)
   } else if (likelihood == "gaussian") {
     mu <- lp + eps
@@ -80,13 +81,14 @@ sim_GLMM_data <- function(n, m, randef_type, likelihood,
 
 run_simulation_experiment <- function(nsim, sigma2, likelihood, path, 
                                       ndata_try, n_obs_per_group_try, 
-                                      randef_type_try, num_covariates_try) {
+                                      randef_type_try, num_covariates_try,
+                                      run_statsmodels = TRUE) {
   ## Purpose: Perform simulation study / experiments for generalized linear mixed effects models
   ## -----------------------------------------------------------
   ## Arguments: nsim = number of simulation runs
   ## sigma2 = variance of random effects
   ## likelihood = likelihood / data distribution
-  ## path = Path where to save data for runnig Python code via reticulate
+  ## path = Path where to save data for running Python code via reticulate
   ## ndata_try = vector with number of samples
   ## n_obs_per_group_try = vector with number of samples per group
   ## randef_type_try = vector with types of random effects
@@ -147,6 +149,8 @@ run_simulation_experiment <- function(nsim, sigma2, likelihood, path,
               family <- binomial(link = "probit")
             } else if (likelihood=="poisson") {
               family <- poisson(link = "log")
+            } else if (likelihood=="gamma") {
+              family <- Gamma(link = "log")
             }
             t1 <- Sys.time()
             mod <- glmer(formula, data=data.frame(y=y,X,group_data),family=family)
@@ -161,11 +165,13 @@ run_simulation_experiment <- function(nsim, sigma2, likelihood, path,
                                        ctime,mse_coef,mse_vcs))
             print("lme4 finished")
             
-            #-----------------statsmodels-----------------
-            source_python(paste0("GLMM_statsmodels.py"))
-            results <- rbind(results,c("statsmodels",randef_type,n,m,num_covariates,iter,
-                                       time_statsmodels,mse_coefs_statsmodels,mse_vcs_statsmodels))
-            print("statsmodels finished")
+            # -----------------statsmodels-----------------
+            if (run_statsmodels) {
+              source_python(paste0("GLMM_statsmodels.py"))
+              results <- rbind(results,c("statsmodels",randef_type,n,m,num_covariates,iter,
+                                         time_statsmodels,mse_coefs_statsmodels,mse_vcs_statsmodels))
+              print("statsmodels finished")
+            }
           } # end loop over nsim
         } # end loop over num_covariates_try
       } # end loop over ndata_try
@@ -178,6 +184,9 @@ run_simulation_experiment <- function(nsim, sigma2, likelihood, path,
 
 nsim <- 100
 sigma2 <- 1
+
+# nsim <- 10
+# ndata_try <- c(100,200)
 
 ###############################
 ## Varying number of samples
@@ -193,7 +202,7 @@ results_sample_size <- run_simulation_experiment(nsim = nsim, sigma2 = sigma2, l
                                                  n_obs_per_group_try = n_obs_per_group_try,
                                                  randef_type_try = randef_type_try, ndata_try = ndata_try, 
                                                  num_covariates_try = num_covariates_try, path = path)
-write.csv(results_sample_size,file = paste0(path,"results/results_sample_size.csv"), row.names = FALSE)
+write.csv(results_sample_size,file = paste0("results/",gpb_version,"___results_sample_size.csv"), row.names = FALSE)
 
 ###############################
 ## Varying number of covariates
@@ -209,7 +218,7 @@ results_num_covariates <- run_simulation_experiment(nsim = nsim, sigma2 = sigma2
                                                     n_obs_per_group_try = n_obs_per_group_try,
                                                     randef_type_try = randef_type_try, ndata_try = ndata_try, 
                                                     num_covariates_try = num_covariates_try, path = path)
-write.csv(results_num_covariates,file = paste0(path,"results/results_num_covariates.csv"), row.names = FALSE)
+write.csv(results_num_covariates,file = paste0("results/",gpb_version,"___results_num_covariates.csv"), row.names = FALSE)
 
 ###############################
 ## Varying number of groups
@@ -225,7 +234,7 @@ results_number_groups <- run_simulation_experiment(nsim = nsim, sigma2 = sigma2,
                                                    n_obs_per_group_try = n_obs_per_group_try,
                                                    randef_type_try = randef_type_try, ndata_try = ndata_try, 
                                                    num_covariates_try = num_covariates_try, path = path)
-write.csv(results_number_groups,file = paste0(path,"results/results_number_groups.csv"), row.names = FALSE)
+write.csv(results_number_groups,file = paste0("results/",gpb_version,"___results_number_groups.csv"), row.names = FALSE)
 
 ###############################
 ## Different types of random effects
@@ -242,7 +251,7 @@ results_randef_type <- run_simulation_experiment(nsim = nsim, sigma2 = sigma2, l
                                                  n_obs_per_group_try = n_obs_per_group_try,
                                                  randef_type_try = randef_type_try, ndata_try = ndata_try, 
                                                  num_covariates_try = num_covariates_try, path = path)
-write.csv(results_randef_type,file = paste0(path,"results/results_randef_type.csv"), row.names = FALSE)
+write.csv(results_randef_type,file = paste0("results/",gpb_version,"___results_randef_type.csv"), row.names = FALSE)
 
 ###############################
 ## Other likelihood: varying number of samples
@@ -258,18 +267,18 @@ results_poisson_sample_size <- run_simulation_experiment(nsim = nsim, sigma2 = s
                                                          n_obs_per_group_try = n_obs_per_group_try,
                                                          randef_type_try = randef_type_try, ndata_try = ndata_try, 
                                                          num_covariates_try = num_covariates_try, path = path)
-write.csv(results_poisson_sample_size,file = paste0(path,"results/results_poisson_sample_size.csv"), row.names = FALSE)
+write.csv(results_poisson_sample_size,file = paste0("results/",gpb_version,"___results_poisson_sample_size.csv"), row.names = FALSE)
 
 
 
 ###############################
 ## Plot results
 ###############################
-results_sample_size <- read.csv(file = paste0(path,"results/results_sample_size.csv"))
-results_num_covariates <- read.csv(file = paste0(path,"results/results_num_covariates.csv"))
-results_number_groups <- read.csv(file = paste0(path,"results/results_number_groups.csv"))
-results_randef_type <- read.csv(file = paste0(path,"results/results_randef_type.csv"))
-results_poisson_sample_size <- read.csv(file = paste0(path,"results/results_poisson_sample_size.csv"))
+results_sample_size <- read.csv(file = paste0("results/",gpb_version,"___results_sample_size.csv"))
+results_num_covariates <- read.csv(file = paste0("results/",gpb_version,"___results_num_covariates.csv"))
+results_number_groups <- read.csv(file = paste0("results/",gpb_version,"___results_number_groups.csv"))
+results_randef_type <- read.csv(file = paste0("results/",gpb_version,"___results_randef_type.csv"))
+results_poisson_sample_size <- read.csv(file = paste0("results/",gpb_version,"___results_poisson_sample_size.csv"))
 
 library(ggplot2)
 library(gridExtra)
@@ -311,7 +320,7 @@ p3 <- ggplot(data=results_sample_size, aes(x=n,y=mse_coefs,color=package,shape=p
          shape=guide_legend(title="Package"))
 
 pall <- grid.arrange(p1, p2, p3, ncol=3, widths=c(1,1,1.45))
-ggsave(pall,file=paste0(path,"plots/","Results_sample_size.jpeg"),height=height_all,width=4*height_all)
+ggsave(pall,file=paste0("results/",gpb_version,"___Sample_size.jpeg"),height=height_all,width=4*height_all)
 
 
 ## Varying number of covariates
@@ -349,7 +358,7 @@ p3 <- ggplot(data=results_num_covariates, aes(x=num_covariates,y=mse_vcs,color=p
          shape=guide_legend(title="Package"))
 
 pall <- grid.arrange(p1, p2, p3, ncol=3, widths=c(1,1,1.45))
-ggsave(pall,file=paste0(path,"plots/","Results_num_covariates.jpeg"),height=height_all,width=4*height_all)
+ggsave(pall,file=paste0("results/",gpb_version,"___Num_covariates.jpeg"),height=height_all,width=4*height_all)
 
 
 ## Varying number of groups
@@ -387,7 +396,7 @@ p3 <- ggplot(data=results_number_groups, aes(x=m,y=mse_vcs,color=package,shape=p
          shape=guide_legend(title="Package"))
 
 pall <- grid.arrange(p1, p2, p3, ncol=3, widths=c(1,1,1.45))
-ggsave(pall,file=paste0(path,"plots/","Results_num_groups.jpeg"),height=height_all,width=4*height_all)
+ggsave(pall,file=paste0("results/",gpb_version,"___Num_groups.jpeg"),height=height_all,width=4*height_all)
 
 
 ## Varying types of random effects
@@ -432,7 +441,7 @@ p3 <- ggplot(data=results_randef_type, aes(x=randef_type,y=mse_vcs,color=package
          shape=guide_legend(title="Package"))
 
 pall <- grid.arrange(p1, p2, p3, ncol=3, widths=c(1,1,1.45))
-ggsave(pall,file=paste0(path,"plots/","Results_randef_type.jpeg"),height=height_all,width=3.5*height_all)
+ggsave(pall,file=paste0("results/",gpb_version,"___Randef_type.jpeg"),height=height_all,width=3.5*height_all)
 
 
 ## Poisson likelihood
@@ -470,7 +479,7 @@ p3 <- ggplot(data=results_poisson_sample_size, aes(x=n,y=mse_coefs,color=package
          shape=guide_legend(title="Package"))
 
 pall <- grid.arrange(p1, p2, p3, ncol=3, widths=c(1,1,1.45))
-ggsave(pall,file=paste0(path,"plots/","Results_poisson_sample_size.jpeg"),height=height_all,width=4*height_all)
+ggsave(pall,file=paste0("results/",gpb_version,"___Poisson_sample_size.jpeg"),height=height_all,width=4*height_all)
 
 
 library(dplyr)
